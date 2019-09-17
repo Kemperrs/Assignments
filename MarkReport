@@ -1,0 +1,94 @@
+// Produce a student mark report based on numerical value
+
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <math.h>
+
+#define MAX_REC 100 // max len of record
+#define MAX_LINE 100 // max length of line
+
+typedef struct  { // declared structure
+	char name[20]; // names
+	float score; // marks
+} RECORD; // record structure
+
+char letter_grade(float); // call function letter grade
+int data_import(RECORD dataset[], char *); // copies object of RECORD type into spot in dataset array
+int data_report(RECORD dataset[], int, char *); 
+
+//---------------------------------------------------------
+int main(int argc, char *args[]) {
+	RECORD dataset[MAX_REC];
+	int record_count = 0;
+
+	char infilename[40] = "marks.txt";    //default input file name
+	char outfilename[40]= "report.txt";   //default output file name
+
+	if (argc > 1) {
+		if (argc >= 2) strcpy(infilename, args[1]);
+		if (argc >= 3) strcpy(outfilename,args[2]);
+	}  
+
+	record_count = data_import(dataset, infilename); 
+
+    if (record_count >=1) 
+		data_report(dataset, record_count, outfilename);
+	else 
+		printf("no data is found");
+
+	return 0;
+}
+
+char letter_grade(float score){
+
+if (100 >= score >= 85)
+	return "A";
+else if (85 > score >= 70)
+	return "B";
+else if (70 > score >= 60)
+	return "C";
+else if (60 > score >= 50)
+	return "D";
+else
+	return 'F';
+}
+
+
+//---------------------------------------------------------
+int data_import(RECORD dataset[], char *filename) { 
+char line[MAX_LINE];
+char delimiters[] = ",";
+int i = 0;
+FILE *fp = NULL;
+char *token;
+int count =0;
+
+if ((fp = fopen(filename, "r")) == NULL) {
+    printf("\nCannot open file '%s'.\n", filename);
+} else {
+	token = strtok(line,delimiters);
+	while (i < MAX_REC && token != NULL) {
+    
+    dataset[i] = atoi(token);
+    i++;
+    token = strtok(NULL, delimiters);
+  }
+  count = i;
+
+  for (i = 0; i < count; i++) {
+    printf("%d\n", dataset[i]);
+  }
+
+
+return i;
+}
+
+//---------------------------------------------------------
+int data_report(RECORD dataset[], int n, char *filename) {
+// compute mean and standard deviation
+// print dataset[i].name, letter_grade(dataset[i].score) to file using format "%-15s%c\n";
+// print to file using format  "%-20s%3.1f\n", 
+return 0;
+}
