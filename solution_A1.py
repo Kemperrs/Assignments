@@ -1,5 +1,5 @@
 #--------------------------
-# Your Name and ID <------------Change This ----------
+# Kayla Kempers - 171429390
 # CP460 (Fall 2019)
 # Assignment 1
 #--------------------------
@@ -109,6 +109,12 @@ def e_scytale(plaintext, key):
     return ciphertext
 
 
+###############################################################################################################
+
+
+
+
+#   Developed Functions          #
 #---------------------------------
 #       Problem 1                #
 #---------------------------------
@@ -122,45 +128,31 @@ def e_scytale(plaintext, key):
 #---------------------------------------------------
 def d_scytale(ciphertext, key):
     plaintext = ''
-    #missing check for spaces indicating wrong key (spaces in more than last row)
-
-    #ciphertext = "MTRSTOHOSHVEOOETPU"
-    #             M    O    V   E        # 554
-    #              T    H    E   T       # 554
-    #               R    O    O   P      # 554
-    #                S    S    O   U 
-    #                 T    H          
-    #key = "5"
-
 
     numCols = len(ciphertext) // int(key) + 1 #to determine grid size
     spaces = (numCols*int(key)) - len(ciphertext) #to determine how many spaces will be present
-    
 
-
-    for i in range(int(key)+1):
-        j = i
-        counter = 0
-        #print("i/j:", i, "\ncounter =", counter)
-        while j <= len(ciphertext) and counter < int(key) and len(plaintext) < len(ciphertext):
-            #print("counter =", counter, "\nj: ", j)
-            if counter <= spaces:
-                plaintext=plaintext+ciphertext[j]
-                j = j+(int(key)+1)
-                #print("IF section, plaintext = ", plaintext, "\nj: ", j)
+    if spaces > numCols: #too many spaces means not correct key
+        return ""
+    else:
+        for i in range(int(key)):
+            j = i
+            counter = 0
+        
+            while j < len(ciphertext) and len(plaintext) < len(ciphertext):
+                if counter < (numCols-spaces):
+                    plaintext=plaintext+ciphertext[j]
+                    j = j+(int(key))
       
-            else:
-                plaintext=plaintext+ciphertext[j-1]
-                j = j+(int(key)-1)
-                #print("ELSE section, plaintext = ", plaintext, "\nj: ", j)
+                else:
+                    plaintext=plaintext+ciphertext[j]
+                    j = j+(int(key)-1)
               
-            counter += 1
-           
+                counter += 1
+        
 
-    return plaintext
-
-
-
+        return plaintext
+    
 
 #---------------------------------
 #       Problem 2                #
@@ -182,8 +174,6 @@ def load_dictionary(dictFile):
     
     for x in range(len(dictList)):  
         dictList[x] = dictList[x].strip()
-        #x.strip()
-    print(dictList)
 
     fp.close()
     return dictList
@@ -206,11 +196,14 @@ def text_to_words(text):
         wordList[x] = re.sub("\B[^a-zA-Z0-9_]",'', wordList[x])  #/W
         wordList[x] = re.sub("[^a-zA-Z0-9_]\B",'', wordList[x])
 
+        
+        #! below method keeps removing middle punctuation, not just beginning and end
+        #wordList[x] = wordList[x].translate(str.maketrans('', '', string.punctuation))
+                
+        
+
     return wordList
 
-#for x in range(len(wordList)):
-#        wordList[x] = re.sub("[^a-zA-Z]", "", wordList[x])
-#        print(wordList[x])
 
 #-----------------------------------------------------------
 # Parameters:   text (string)
@@ -252,8 +245,10 @@ def is_plaintext(text, dictFile, threshold):
         return False
     else:
         matches, mismatches = analyze_text(text, dictFile)
-        if matches/(matches + mismatches) >= threshold: return True
-        else: return False
+        if (matches/(matches + mismatches)) >= threshold:
+            return True
+        else:
+            return False
 
 #---------------------------------
 #       Problem 3                #
@@ -273,6 +268,13 @@ def is_plaintext(text, dictFile, threshold):
 #               If decrytpoin fails: print error msg and return ''
 #---------------------------------------------------
 def cryptanalysis_scytale(cipherFile, dictFile, startKey, endKey, threshold):
+
+    fp = open(cipherFile, 'r', encoding="mbcs")
+    cFile = fp.read()
+
+    fp.close()
+
+    
     if startKey < 2 or endKey > 100:
         print("Error, the key range is invalid")
         return ''
@@ -281,15 +283,19 @@ def cryptanalysis_scytale(cipherFile, dictFile, startKey, endKey, threshold):
         return ''
 
     for x in range(startKey, endKey):
-        plainText = d_scytale(cipherFile, x)
+        print("Checking key: ", x)
+        plainText = d_scytale(cFile, x) #plaintext given ciphertext and key
         textCheck = is_plaintext(plainText, dictFile, threshold)
-        if textCheck: key = x
+        if textCheck:
+            print("\nKey found: ", x)
+            key = x
+            break
     
     if textCheck:
         print(plainText)
         return key
     else:
-        print("Error, could not decrypt")
+        print("Error, could not decrypt (no key found)")
         return ''
 
 #---------------------------------
@@ -404,4 +410,6 @@ def d_polybius(ciphertext, key):
 
     return plaintext
     
+
+
 
